@@ -33,12 +33,12 @@ for _ in range(data['pages']):
     vacancies = vacancies.union(new_vacancies)
     PARAMS['page'] += 1
 
-# now we can inspect every vacancy
+# now we can inspect every vacancy and put data in csv file
 data = ['vacancy_id,vacancy_name,salary_from,salary_to,currency,area'.split(',')]
-count = 30
+# count = 30
 for vacancy_id in vacancies:
-    count -= 1
-    if count < 1:
+    # count -= 1
+    # if count < 1:
         break
     vacancy_data = requests.get(os.path.join(URL, vacancy_id)).json()
     name = vacancy_data.get('name')
