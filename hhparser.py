@@ -9,17 +9,26 @@ HEADERS = {
 }
 PARAMS = {
     'text': 'Python',
-    # 'page': '55',
-    'per_page': '20',
+    'page': 0,
+    'per_page': '100',
     # 'pages': '2',
 }
-r = requests.get(URL, params=PARAMS, headers=HEADERS)
-data = r.json()
-print('data received', data)
-vacancies = data['items']
-print(len(vacancies), ' vacancies found')
-print(data['found'])
-for vacancy in vacancies:
+data = requests.get(URL, params=PARAMS, headers=HEADERS).json() # just to get page quantity
+
+vacancies = set()
+
+# now collect vacancy ids from all pages
+for _ in range(data['pages']):
+    new_data = requests.get(URL, params=PARAMS, headers=HEADERS).json()
+    new_vacancies = {i['id'] for i in new_data['items']}
+    vacancies = vacancies.union(new_vacancies)
+    PARAMS['page'] += 1
+
+# now we can inspect every vacancy
+for vacancy_id in vacancies:
+    vacancy_data = requests.get(os.path.join(URL, vacancy_id)).json()
+    print(vacancy_data.get('name'), vacancy_data.get('salary'), vacancy_data['area']['name'])
+'''for vacancy in vacancies:
     try:
         print(vacancy.get('name') or 'No info',
               vacancy['salary']['from'] if vacancy['salary'] else 'No info',
@@ -45,4 +54,4 @@ for vacancy in vacancies:
             text = soup.get_text()
             print(req.json().get('description'))
     except TypeError:
-        print(vacancy)
+        print(vacancy)'''
