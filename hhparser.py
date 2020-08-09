@@ -2,6 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+import csv
+
+
+def csv_write(data,path):
+    with open(path, 'w', newline='') as csv_file:
+        writer = csv.writer(csv_file, delimiter=',')
+        for line in data:
+            writer.writerow(line)
+
 
 URL = 'https://api.hh.ru/vacancies'
 HEADERS = {
@@ -25,33 +34,22 @@ for _ in range(data['pages']):
     PARAMS['page'] += 1
 
 # now we can inspect every vacancy
+data = ['vacancy_id,vacancy_name,salary_from,salary_to,currency,area'.split(',')]
+count = 30
 for vacancy_id in vacancies:
+    count -= 1
+    if count < 1:
+        break
     vacancy_data = requests.get(os.path.join(URL, vacancy_id)).json()
-    print(vacancy_data.get('name'), vacancy_data.get('salary'), vacancy_data['area']['name'])
-'''for vacancy in vacancies:
-    try:
-        print(vacancy.get('name') or 'No info',
-              vacancy['salary']['from'] if vacancy['salary'] else 'No info',
-              # vacancy.get('salary')['currency']
-              # vacancy.get('key_skills'),
-              # vacancy.get('has_test'),
-              # vacancy.get('description')
-              )
-        req = requests.get(os.path.join(URL, vacancy['id']))
-
-        if req.json().get('area'):
-            area_name = req.json().get('area')['name']
-            print(area_name)
-        if req.json().get('key_skills'):
-            key_skills = req.json().get('key_skills')
-            for skill in key_skills:
-                print(skill['name'], end=' ')
-            print('\n')
-        for key in vacancy:
-            print(key, vacancy[key])
-        if req.json().get('description'):
-            soup = BeautifulSoup(req.json().get('description'))
-            text = soup.get_text()
-            print(req.json().get('description'))
-    except TypeError:
-        print(vacancy)'''
+    name = vacancy_data.get('name')
+    salary = vacancy_data.get('salary')
+    if salary:
+        salary_from = salary.get('from')
+        salary_to = salary.get('to')
+        currency = salary.get('currency')
+    else:
+        salary_from, salary_to, currency = None, None, None
+    area = vacancy_data['area']['name']
+    data.append([vacancy_id, name, salary_from, salary_to, currency, area])
+    print([vacancy_id, name, salary_from, salary_to, currency, area])
+csv_write(data, 'output.txt')
