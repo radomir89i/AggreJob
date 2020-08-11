@@ -12,44 +12,55 @@ def csv_write(data,path):
             writer.writerow(line)
 
 
-URL = 'https://api.hh.ru/vacancies'
-HEADERS = {
-    'User-Agent': 'api-test-agent'
-}
-PARAMS = {
-    'text': 'Python',
-    'page': 0,
-    'per_page': '100',
-    # 'pages': '2',
-}
-data = requests.get(URL, params=PARAMS, headers=HEADERS).json() # just to get page quantity
+def parse_hh():
+    URL = 'https://api.hh.ru/vacancies'
+    HEADERS = {
+        'User-Agent': 'api-test-agent'
+    }
+    PARAMS = {
+        'text': 'Python',
+        'page': 0,
+        'per_page': '100',
+        # 'pages': '2',
+    }
 
-vacancies = set()
+    data = requests.get(URL, params=PARAMS, headers=HEADERS).json() # just to get page quantity
 
-# now collect vacancy ids from all pages
-for _ in range(data['pages']):
-    new_data = requests.get(URL, params=PARAMS, headers=HEADERS).json()
-    new_vacancies = {i['id'] for i in new_data['items']}
-    vacancies = vacancies.union(new_vacancies)
-    PARAMS['page'] += 1
+    vacancies = set()
 
-# now we can inspect every vacancy and put data in csv file
-data = ['vacancy_id,vacancy_name,salary_from,salary_to,currency,area'.split(',')]
-# count = 30
-for vacancy_id in vacancies:
-    # count -= 1
-    # if count < 1:
-        break
-    vacancy_data = requests.get(os.path.join(URL, vacancy_id)).json()
-    name = vacancy_data.get('name')
-    salary = vacancy_data.get('salary')
-    if salary:
-        salary_from = salary.get('from')
-        salary_to = salary.get('to')
-        currency = salary.get('currency')
-    else:
-        salary_from, salary_to, currency = None, None, None
-    area = vacancy_data['area']['name']
-    data.append([vacancy_id, name, salary_from, salary_to, currency, area])
-    print([vacancy_id, name, salary_from, salary_to, currency, area])
-csv_write(data, 'output.txt')
+    # now collect vacancy ids from all pages
+    for _ in range(data['pages']):
+        new_data = requests.get(URL, params=PARAMS, headers=HEADERS).json()
+        new_vacancies = {i['id'] for i in new_data['items']}
+        vacancies = vacancies.union(new_vacancies)
+        PARAMS['page'] += 1
+
+    # now we can inspect every vacancy and put data in csv file
+    data = ['vacancy_id,vacancy_name,salary_from,salary_to,currency,area'.split(',')]
+    count = 30
+    for vacancy_id in vacancies:
+        count -= 1
+        if count < 1:
+            break
+        vacancy_data = requests.get(os.path.join(URL, vacancy_id)).json()
+        name = vacancy_data.get('name')
+        salary = vacancy_data.get('salary')
+        if salary:
+            salary_from = salary.get('from')
+            salary_to = salary.get('to')
+            currency = salary.get('currency')
+        else:
+            salary_from, salary_to, currency = None, None, None
+        area = vacancy_data['area']['name']
+        data.append([vacancy_id, name, salary_from, salary_to, currency, area])
+        # print([vacancy_id, name, salary_from, salary_to, currency, area])
+    # print(data)
+    #  return data
+    csv_write(data, 'raw_data.csv')
+    with open('raw_data.csv', 'r') as f:
+        proper_data = f.read()
+    return proper_data
+
+
+if __name__ == '__main__':
+    parse_hh('output.csv')
