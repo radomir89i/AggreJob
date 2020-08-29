@@ -2,51 +2,54 @@ from abc import ABC, abstractmethod
 import requests
 import re
 import yaml
-
+from bs4 import BeautifulSoup
 
 class Parser(ABC):
-    @staticmethod
-    def get_config(parameter):
-        """Get parameter from config.yml file"""
-
-        with open('config.yml') as f:
-            config = yaml.safe_load(f)
-        return config[parameter]
-
     @abstractmethod
     def __init__(self, specialization):
         self.specialization = specialization
 
+    # @abstractmethod
+    def get_config(self):
+        """Get parameter from config.yml file"""
+
+        with open('config.yml') as f:
+            config = yaml.safe_load(f)
+        return config[self.specialization]
+
     @abstractmethod
     def parse(self):
+        """Parses vacancy text """
         pass
 
     @abstractmethod
     def clean_vacancy_data(self, vacancy):
+        """Cleans vacancy text """
         pass
 
     @staticmethod
     def write_csv_file(path, data):
+        """Writes parsing result to csv file"""
         pass
 
 
 class HHParser(Parser):
-    def __init__(self, specialization):
-        Parser.__init__(self, specialization)
-        self.KEY_SKILLS = Parser.get_config('KEY_SKILLS')
-        self.params = {
-            'text': self.specialization,
-            'per_page': '100',
-            'page': 0,
-        }
 
     URL = 'https://api.hh.ru/vacancies'
     HEADERS = {
         'User-Agent': 'api-test-agent'
     }
 
+    def __init__(self, specialization):
+        Parser.__init__(self, specialization)
+        self.KEY_SKILLS = Parser.get_config(self)
+        self.params = {
+            'text': self.specialization,
+            'per_page': '100',
+            'page': 0,
+        }
+
     def clean_vacancy_data(self, vacancy):
-        """Cleans vacancy text """
 
         vacancy_data = {
             'name': vacancy['name'],
@@ -55,7 +58,7 @@ class HHParser(Parser):
 
         if vacancy_data.get('salary'):
             vacancy_data['salary_from'] = vacancy['salary'].get('from')
-            vacancy_data['salary_from'] = vacancy['s alary'].get('from')
+            vacancy_data['salary_from'] = vacancy['salary'].get('from')
             vacancy_data['salary_currency'] = vacancy['salary']['currency']
             vacancy_data['salary_gross'] = vacancy['salary']['gross']
 
@@ -67,28 +70,25 @@ class HHParser(Parser):
             if skill in words:
                 vacancy_skill_set.add(skill)
         vacancy_data['skill_set'] = vacancy_skill_set
-
+        vacancy_data['requirement'] = vacancy['snippet'].get('requirement')
+        vacancy_data['responsibility'] = vacancy['snippet'].get('responsibility')
         return vacancy_data
 
     def parse(self):
-        """Parses vacancy text """
+
         result = {}
         data = requests.get(self.URL, params=self.params, headers=self.HEADERS).json()
         current_page_vacancies = data['items']
         pages = data['pages']
-        for i in range(1): # change range(x) to 'pages' to go for a full cycle
+        for i in range(1):  # change range(x) to 'pages' to go for a full cycle
             self.params['page'] = i
             print(i)
             for vacancy in current_page_vacancies:
+                '''for k, v in vacancy.items():
+                    print(k, v)'''
                 vac_data = requests.get(self.URL + '/' + vacancy['id'], params=self.params).json()
-                '''vac_id = vac_data['id']
-                vac_name = vac_data['name']
-                result[vac_id] = vac_name'''
-
                 vac_id = vac_data['id']
-                # print(vac_id)
                 cleaned_data = HHParser.clean_vacancy_data(self, vacancy)
-                # print(cleaned_data)
                 result[vac_id] = cleaned_data
 
         return result
