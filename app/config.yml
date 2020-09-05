@@ -13,3 +13,45 @@ python:
   - redis
   - postgresql
   - mysql
+
+java:
+
+  - spring
+  - sql
+  - git
+  - postgresql
+  - hibernate
+  - javascript
+  - mysql
+  - junit
+  - html
+  - css
+  - soap
+  - jdbc
+  - docker
+  - kotlin
+  - mongodb
+  - jpa
+  - angularjs
+  - python
+  - c++
+
+c++:
+
+  - git
+  - python
+  - stl
+  - sql
+  - c#
+  - java
+  - postgresql
+  - javascript
+  - svn
+  - boost
+  - bash
+  - stm32
+  - .NET
+  - delphi
+  - qnx
+  - rtp
+   php
