@@ -8,17 +8,13 @@ import lxml
 
 
 class Parser(ABC):
-    @abstractmethod
-    def __init__(self, specialization: str):
-        self.specialization = specialization
-
-    # @abstractmethod
-    def get_config(self) -> list:
-        """Get parameter from config.yml file"""
+    @staticmethod
+    def _get_key_skills(specialization):
+        """Get key skills from config.yml file"""
 
         with open('config.yml') as f:
             config = yaml.safe_load(f)
-        return config[self.specialization]
+        return config[specialization]
 
     @abstractmethod
     def parse(self) -> list:
@@ -46,8 +42,8 @@ class HHParser(Parser):
     }
 
     def __init__(self, specialization):
-        Parser.__init__(self, specialization)
-        self.KEY_SKILLS = Parser.get_config(self)
+        self.specialization = specialization
+        self.key_skills = Parser._get_key_skills(self.specialization)
         self.params = {
             'text': self.specialization,
             'per_page': '100',
@@ -69,7 +65,7 @@ class HHParser(Parser):
         skill_set = []
         words = re.split(r'[;,"\(\)\{\}/\s]', str(vacancy))
         words = [word.lower() for word in words]
-        for skill in self.KEY_SKILLS:
+        for skill in self.key_skills:
             if skill in words:
                 skill_set.append(skill)
 
@@ -86,9 +82,8 @@ class HHParser(Parser):
         data = requests.get(self.URL, params=self.params, headers=self.HEADERS).json()
         current_page_vacancies = data['items']
         pages = data['pages']
-        for i in range(1):  # change range(x) to 'pages' to go for a full cycle
+        for i in range(1):
             self.params['page'] = i
-            print(i)
             for vacancy in current_page_vacancies:
                 vac_data = requests.get(self.URL + '/' + vacancy['id'], params=self.params).json()
                 cleaned_data = HHParser.clean_vacancy_data(self, vac_data)
@@ -103,5 +98,7 @@ class MKParser:
 
 if __name__ == '__main__':
     parser = HHParser('python')
-    Parser.write_csv_file('parsed_data.csv',parser.parse())
+    data = parser.parse()
+    print('got data')
+    Parser.write_csv_file('parsed_data.csv', data)
 
