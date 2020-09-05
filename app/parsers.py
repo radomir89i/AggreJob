@@ -9,10 +9,9 @@ import lxml
 
 class Parser(ABC):
     @staticmethod
-    def _get_key_skills(specialization):
+    def _get_key_skills(path, specialization: str) -> list:
         """Get key skills from config.yml file"""
-
-        with open('config.yml') as f:
+        with open(path) as f:
             config = yaml.safe_load(f)
         return config[specialization]
 
@@ -79,11 +78,12 @@ class HHParser(Parser):
 
         result = []
         result.append('id, name, salary_from, salary_to, currency, area, skill_set, description'.split(', '))
-        data = requests.get(self.URL, params=self.params, headers=self.HEADERS).json()
-        current_page_vacancies = data['items']
-        pages = data['pages']
-        for i in range(1):
+        s = requests.Session()
+        pages = s.get(self.URL, params=self.params, headers=self.HEADERS).json()['pages']
+        for i in range(pages):
             self.params['page'] = i
+            data = s.get(self.URL, params=self.params, headers=self.HEADERS).json()
+            current_page_vacancies = data['items']
             for vacancy in current_page_vacancies:
                 vac_data = requests.get(self.URL + '/' + vacancy['id'], params=self.params).json()
                 cleaned_data = HHParser.clean_vacancy_data(self, vac_data)
@@ -96,9 +96,5 @@ class MKParser:
         pass
 
 
-if __name__ == '__main__':
-    parser = HHParser('python')
-    data = parser.parse()
-    print('got data')
-    Parser.write_csv_file('parsed_data.csv', data)
+
 
