@@ -1,5 +1,4 @@
 python:
-
   - django
   - git
   - r
@@ -15,7 +14,6 @@ python:
   - mysql
 
 java:
-
   - spring
   - sql
   - git
@@ -37,7 +35,6 @@ java:
   - c++
 
 c++:
-
   - git
   - python
   - stl
