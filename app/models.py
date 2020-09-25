@@ -2,21 +2,23 @@ from app import db
 
 
 class Vacancy(db.Model):
+    # todo: add constraints to columns that should not equal to None
+
     __table_name__ = 'vacancies'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     vacancy_id = db.Column(db.Integer, index=True, unique=True)
+    vacancy_name = db.Column(db.String(64))
     source = db.Column(db.String(64))
-    employer = db.Column(db.String(64))
-    name = db.Column(db.String(64))
+    company = db.Column(db.String(64))
     salary_from = db.Column(db.Integer)
     salary_to = db.Column(db.Integer)
     currency = db.Column(db.String(16))
-    area = db.Column(db.String(64))
+    location = db.Column(db.String(64))
     skill_set = db.Column(db.String(256))
     description = db.Column(db.Text)
 
     def __repr__(self):
-        return '<Vacancy {}>'.format(self.name)
+        return '<Vacancy {}>'.format(self.vacancy_name)
 
 
 class User(db.Model):
