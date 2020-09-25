@@ -6,7 +6,7 @@ import csv
 from bs4 import BeautifulSoup
 import lxml
 
-CONFIG_PATH = 'config.yml'
+CONFIG_PATH = 'config/spec_key_skills.yml'
 
 
 class Parser(ABC):
