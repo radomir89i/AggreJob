@@ -55,6 +55,7 @@ class HHParser(Parser):
         vac_id = vacancy.get('id')
         name = vacancy.get('name')
         salary = vacancy.get('salary')
+        employer = vacancy['employer']['name']
         if salary:
             salary_from = salary.get('from')
             salary_to = salary.get('to')
@@ -72,17 +73,17 @@ class HHParser(Parser):
 
         description = BeautifulSoup(vacancy.get('description'), 'lxml').text
 
-        vacancy_data = [vac_id, name, salary_from, salary_to, currency, area, skill_set, description]
+        vacancy_data = [vac_id, name, salary_from, salary_to, currency, area, employer, skill_set, description]
 
         return vacancy_data
 
     def parse(self):
 
         result = []
-        result.append('id, name, salary_from, salary_to, currency, area, skill_set, description'.split(', '))
+        result.append('id, name, salary_from, salary_to, currency, area, employer, skill_set, description'.split(', '))
         s = requests.Session()
         pages = s.get(self.URL, params=self.params, headers=self.HEADERS).json()['pages']
-        for i in range(pages):
+        for i in range(1):
             self.params['page'] = i
             data = s.get(self.URL, params=self.params, headers=self.HEADERS).json()
             current_page_vacancies = data['items']
