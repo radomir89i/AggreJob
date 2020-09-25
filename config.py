@@ -3,6 +3,7 @@ import yaml
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+
 class Config(object):
     CONFIG_FOLDER = os.path.join(basedir, 'config')
     VACANCY_FOLDER = os.path.join(basedir, 'vacancy_data')

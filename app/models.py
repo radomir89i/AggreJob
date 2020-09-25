@@ -3,7 +3,8 @@ from app import db
 
 class Vacancy(db.Model):
     # todo: add constraints to columns that should not equal to None
-
+    # todo: add column publication date
+    # todo: is_actual (bool -> True or False)
     __table_name__ = 'vacancies'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     vacancy_id = db.Column(db.Integer, index=True, unique=True)
