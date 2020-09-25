@@ -11,7 +11,6 @@ def hello_world():
 @app.route('/get_data')
 def get_data():
     vacancy_name = request.args.get('vacancy_name')
-    # return os.getcwd()
     if vacancy_name == 'python':
         content = ''
         data = pd.read_csv('proper_data.csv', delimiter=',').values
