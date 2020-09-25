@@ -9,6 +9,4 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-app.config['DEBUG'] = True
-
 from app import routes, models
