@@ -1,19 +1,19 @@
-from google.oauth2 import service_account
-from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
-from googleapiclient.discovery import build
 import io
 import os
+
 import pandas as pd
 from sqlalchemy import create_engine
+from google.oauth2 import service_account
+from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.discovery import build
 
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = '../credentials.json'
 FOLDER_ID = '1HrUEphX1chXTYCr7k2DsX6Q8viDxd2as'
 CREDENTIALS = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES
-)
-DB_CONN = 'top_secret_info'
+              SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+DB_CONN = 'xxx'  # connection info and credentials for db
 service = build('drive', 'v3', credentials=CREDENTIALS)
 
 result = service \
@@ -24,7 +24,18 @@ result = service \
     .execute()['files']
 
 
-def get_csv_files(path=os.getcwd()):
+def delete_csv_files() -> None:
+
+    """
+    Deletes all *.csv files in Google Drive folder.
+    """
+
+    for file in result:
+        if file['mimeType'] == 'text/csv':
+            service.files().delete(fileId=file['id']).execute()
+
+
+def get_csv_files(path=os.getcwd()) -> None:
 
     """
     Gets all *.csv files from Google Drive folder and puts them in folder with given path (current folder by default).
@@ -37,13 +48,14 @@ def get_csv_files(path=os.getcwd()):
             request = service.files().get_media(fileId=file['id'])
             fh = io.FileIO(os.path.join(path, file['name']), 'wb')
             downloader = MediaIoBaseDownload(fh, request)
+
             done = False
             while not done:
                 status, done = downloader.next_chunk()
                 print("Download %d%%." % int(status.progress() * 100))
 
 
-def load_from_csv_to_database(path=os.getcwd()):
+def load_from_csv_to_database(path=os.getcwd()) -> None:
 
     """
     Loads all *.csv files from given folder to database.
@@ -59,5 +71,7 @@ def load_from_csv_to_database(path=os.getcwd()):
 
 
 if __name__ == '__main__':
-    get_csv_files()
-    load_from_csv_to_database()
+    PATH = os.path.join('..', 'app', 'data_files')
+    get_csv_files(path=PATH)
+    load_from_csv_to_database(path=PATH)
+

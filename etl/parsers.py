@@ -1,12 +1,14 @@
-from abc import ABC, abstractmethod
-import requests
+import os
 import re
+from abc import ABC, abstractmethod
+
+import requests
 import yaml
+import lxml
 import csv
 from bs4 import BeautifulSoup
-import lxml
 
-CONFIG_PATH = '../config/spec_key_skills.yml'
+CONFIG_PATH = os.path.join('config', 'spec_key_skills.yml')
 
 
 # def get_ll_by_address(address='Андропова пр-т, 18 к.9, Москва'):
@@ -41,31 +43,51 @@ CONFIG_PATH = '../config/spec_key_skills.yml'
 class Parser(ABC):
     @staticmethod
     def _get_key_skills(specialization: str) -> list:
-        """
-        Load key_skills for each specialization from yaml config
 
-        :param specialization:
-        :return:
         """
-        """"""
+        Gets list of key skills for given specialization.
+        Key skills are predetermined and are kept spec_key_skills.yml file.
+
+        :param specialization: main programming language -> 'Python'
+        :return: list of skills/technologies, connected to specialization -> ['django', 'git', 'linux']
+        """
+
         with open(CONFIG_PATH) as f:
             config = yaml.safe_load(f)
         return config[specialization]
 
     @abstractmethod
     def parse(self) -> list:
-        """Parses vacancy text """
+
+        """
+        Returns prepared data for writing in .csv file. The data is a list of lists(vacancies).
+        The first list contains headers for .csv file -> ['vacancy_id, vacancy_name, url, source,
+        salary_from, salary_to, currency, location, company, skill_set, description, publication_date']
+
+        """
         pass
 
     @abstractmethod
     def clean_vacancy_data(self, vacancy: dict) -> list:
-        """Cleans vacancy text """
+
+        """
+        Parses vacancy data returned by source(job search website)
+        :param vacancy: dict with vacancy data from source
+        :return: list of needed vacancy info accordingly to .csv header
+        """
         pass
 
     @staticmethod
-    def write_csv_file(path, data: list):
-        """Writes parsing result to csv file"""
-        with open(path, "w") as f:
+    def write_csv_file(path, data: list) -> None:
+
+        """
+        Writes prepared data to adjusted .csv file.
+        :param path: path to input file
+        :param data: list of lists
+        :return: None
+        """
+
+        with open(path, "w", encoding='utf-8') as f:
             writer = csv.writer(f, delimiter=",")
             writer.writerows(data)
 
@@ -77,7 +99,7 @@ class HHParser(Parser):
         'User-Agent': 'api-test-agent'
     }
 
-    def __init__(self, specialization):
+    def __init__(self, specialization: str):
         self.specialization = specialization
         self.key_skills = Parser._get_key_skills(self.specialization)
         self.params = {
@@ -87,45 +109,58 @@ class HHParser(Parser):
         }
 
     def clean_vacancy_data(self, vacancy):
-        vac_id = vacancy.get('id')
-        name = vacancy.get('name')
+        vacancy_id = vacancy.get('id')
+        vacancy_name = vacancy.get('name')
+        url = vacancy.get('alternate_url')
+        source = 'HH'
         salary = vacancy.get('salary')
         employer = vacancy['employer']['name']
+        publication_date = vacancy.get('published_at').split('T')[0]
+
         if salary:
             salary_from = salary.get('from')
             salary_to = salary.get('to')
             currency = salary.get('currency')
         else:
             salary_from, salary_to, currency = None, None, None
-        area = vacancy['area']['name']
+        location = vacancy['area']['name']
 
         skill_set = []
         words = re.split(r'[;,"\(\)\{\}/\s]', str(vacancy))
         words = [word.lower() for word in words]
+
         for skill in self.key_skills:
             if skill in words:
                 skill_set.append(skill)
 
         description = BeautifulSoup(vacancy.get('description'), 'lxml').text
 
-        vacancy_data = [vac_id, name, salary_from, salary_to, currency, area, employer, skill_set, description]
+        vacancy_data = [vacancy_id, vacancy_name, url, source, salary_from,
+                        salary_to, currency, location, employer,
+                        skill_set, description, publication_date]
 
         return vacancy_data
 
     def parse(self):
 
         result = []
-        result.append('id, name, salary_from, salary_to, currency, area, employer, skill_set, description'.split(', '))
+        result.append('vacancy_id, vacancy_name, url, source, '
+                      'salary_from, salary_to, currency, location, '
+                      'company, skill_set, description, publication_date'.split(', '))
+
         s = requests.Session()
+
         pages = s.get(self.URL, params=self.params, headers=self.HEADERS).json()['pages']
-        for i in range(1):
+        for i in range(1):  # replace with 'pages' variable
             self.params['page'] = i
             data = s.get(self.URL, params=self.params, headers=self.HEADERS).json()
             current_page_vacancies = data['items']
+
             for vacancy in current_page_vacancies:
                 vac_data = requests.get(self.URL + '/' + vacancy['id'], params=self.params).json()
                 cleaned_data = HHParser.clean_vacancy_data(self, vac_data)
                 result.append(cleaned_data)
+
         return result
 
 
