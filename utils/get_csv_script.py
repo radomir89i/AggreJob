@@ -3,18 +3,16 @@ import os
 
 import pandas as pd
 from sqlalchemy import create_engine
-from google.oauth2 import service_account
+
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.discovery import build
 
+from config import GD_CREDENTIALS, DB_CONN, EXPORT_FOLDER
 
-SCOPES = ['https://www.googleapis.com/auth/drive']
-SERVICE_ACCOUNT_FILE = '../credentials.json'
 FOLDER_ID = '1HrUEphX1chXTYCr7k2DsX6Q8viDxd2as'
-CREDENTIALS = service_account.Credentials.from_service_account_file(
-              SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-DB_CONN = 'xxx'  # connection info and credentials for db
-service = build('drive', 'v3', credentials=CREDENTIALS)
+
+
+service = build('drive', 'v3', credentials=GD_CREDENTIALS)
 
 result = service \
     .files() \
@@ -35,12 +33,11 @@ def delete_csv_files() -> None:
             service.files().delete(fileId=file['id']).execute()
 
 
-def get_csv_files(path=os.getcwd()) -> None:
+def get_csv_files(path=EXPORT_FOLDER) -> None:
 
     """
     Gets all *.csv files from Google Drive folder and puts them in folder with given path (current folder by default).
     :param path: path to folder where downloaded files should be placed
-    :return: None
     """
 
     for file in result:
@@ -55,12 +52,11 @@ def get_csv_files(path=os.getcwd()) -> None:
                 print("Download %d%%." % int(status.progress() * 100))
 
 
-def load_from_csv_to_database(path=os.getcwd()) -> None:
+def load_from_csv_to_database(path=EXPORT_FOLDER) -> None:
 
     """
     Loads all *.csv files from given folder to database.
     :param path: path to *csv files folder
-    :return: None
     """
 
     engine = create_engine(DB_CONN)
@@ -71,7 +67,6 @@ def load_from_csv_to_database(path=os.getcwd()) -> None:
 
 
 if __name__ == '__main__':
-    PATH = os.path.join('..', 'app', 'data_files')
-    get_csv_files(path=PATH)
-    load_from_csv_to_database(path=PATH)
+    # get_csv_files()
+    load_from_csv_to_database()
 
