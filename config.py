@@ -1,5 +1,4 @@
 import os
-import json
 
 import yaml
 from google.oauth2 import service_account
@@ -31,6 +30,3 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
 
-
-if __name__ == '__main__':
-    print(get_creds('gdrive_credentials')['private_key'])
