@@ -7,7 +7,7 @@ import lxml
 import csv
 from bs4 import BeautifulSoup
 
-from ..config import KEY_SKILLS_FILE
+from ..config import Config
 
 
 class Parser(ABC):
@@ -22,7 +22,7 @@ class Parser(ABC):
         :return: list of skills/technologies, connected to specialization -> ['django', 'git', 'linux']
         """
 
-        with open(KEY_SKILLS_FILE) as f:
+        with open(Config.KEY_SKILLS_FILE) as f:
             config = yaml.safe_load(f)
         return config[specialization]
 

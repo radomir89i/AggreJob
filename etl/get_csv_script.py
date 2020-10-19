@@ -69,6 +69,9 @@ def load_from_csv_to_database(target_folder=EXPORT_FOLDER) -> None:
 
 
 if __name__ == '__main__':
-    get_csv_files()
-    load_from_csv_to_database()
+    # get_csv_files()
+    # load_from_csv_to_database()
+    print(os.urandom(12).hex())
+
+
 
