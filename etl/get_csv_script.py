@@ -7,8 +7,7 @@ from sqlalchemy import create_engine
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.discovery import build
 
-from config import DB_CONN, EXPORT_FOLDER
-from config import GoogleDrive
+from config import GoogleDrive, Config
 
 
 service = build('drive', 'v3', credentials=GoogleDrive.GD_CREDENTIALS)
@@ -32,7 +31,7 @@ def delete_csv_files() -> None:
             service.files().delete(fileId=file['id']).execute()
 
 
-def get_csv_files(target_folder=EXPORT_FOLDER) -> None:
+def get_csv_files(target_folder=Config.EXPORT_FOLDER) -> None:
 
     """
     Gets all *.csv files from Google Drive folder and puts them in target folder.
@@ -54,14 +53,14 @@ def get_csv_files(target_folder=EXPORT_FOLDER) -> None:
                 print("Download %d%%." % int(status.progress() * 100))
 
 
-def load_from_csv_to_database(target_folder=EXPORT_FOLDER) -> None:
+def load_from_csv_to_database(target_folder=Config.EXPORT_FOLDER) -> None:
 
     """
     Loads all *.csv files from target folder to database.
     :param target_folder: path to *csv files folder
     """
 
-    engine = create_engine(DB_CONN)
+    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     files = [os.path.join(target_folder, f) for f in os.listdir(target_folder) if f.endswith('.csv')]
     for file in files:
         data = pd.read_csv(file)

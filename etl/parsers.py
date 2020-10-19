@@ -121,7 +121,7 @@ class HHParser(Parser):
         s = requests.Session()
 
         pages = s.get(self.URL, params=self.params, headers=self.HEADERS).json()['pages']
-        for i in range(1):  # replace with 'pages' variable
+        for i in range(pages):
             self.params['page'] = i
             data = s.get(self.URL, params=self.params, headers=self.HEADERS).json()
             current_page_vacancies = data['items']
