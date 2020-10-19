@@ -1,4 +1,3 @@
-import os
 import re
 from abc import ABC, abstractmethod
 
@@ -8,37 +7,8 @@ import lxml
 import csv
 from bs4 import BeautifulSoup
 
-CONFIG_PATH = os.path.join('config', 'spec_key_skills.yml')
+from ..config import KEY_SKILLS_FILE
 
-
-# def get_ll_by_address(address='Андропова пр-т, 18 к.9, Москва'):
-#     """Эта функция возвращает координаты по адресу или сообщение об ошибке
-#
-#     :param address: адрес объекта, следующего формата -> "Андропова пр-т, 18 к.9, Москва"
-#     :type  address: str
-#
-#     :rtype: dict
-#     :return: в случае успешного декодирования -> {"status": "ok", "ll": (lon, lat)}
-#              в случае ошибки при запросе      -> {"status": "error", "msg": "some_error_msg"}
-#     """
-#     addr = '%20'.join(address.split(' '))
-#     ll_content = {'status': 'ok', 'll':()}
-#     params = f'q={addr}&format=json'
-#     url = f'http://search.maps.sputnik.ru/search/addr?{params}'
-#     try:
-#         # data = req.get(url).json()['result'].get('address')
-#         data = req.get(url, proxies={'http': 'http://bproxy.msk.mts.ru:3128'}).json()['result'].get('address')
-#
-#         if data is not None:
-#             ll = data[0]['features'][0]['geometry']['geometries'][0]['coordinates']
-#             ll_content['ll'] = ll
-#         else:
-#             ll_content['status'] =  'error'
-#             ll_content['msg'] = f'Not found coordinates by addr="{address}"'
-#     except Exception as e:
-#         ll_content = {'status': 'error', 'msg': str(e)}
-#
-#     return ll_content
 
 class Parser(ABC):
     @staticmethod
@@ -52,7 +22,7 @@ class Parser(ABC):
         :return: list of skills/technologies, connected to specialization -> ['django', 'git', 'linux']
         """
 
-        with open(CONFIG_PATH) as f:
+        with open(KEY_SKILLS_FILE) as f:
             config = yaml.safe_load(f)
         return config[specialization]
 
