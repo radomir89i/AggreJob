@@ -6,6 +6,7 @@ from google.oauth2 import service_account
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 credentials_file = os.path.join(BASEDIR, 'config', 'credentials.yml')
+KEY_SKILLS_FILE = os.path.join('config', 'spec_key_skills.yml')
 
 
 def get_creds(creds: str):
