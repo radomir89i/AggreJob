@@ -7,10 +7,11 @@ from sqlalchemy import create_engine
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.discovery import build
 
-from config import GD_CREDENTIALS, DB_CONN, EXPORT_FOLDER
+from config import DB_CONN, EXPORT_FOLDER
+from config import GoogleDrive
 
 
-service = build('drive', 'v3', credentials=GD_CREDENTIALS)
+service = build('drive', 'v3', credentials=GoogleDrive.GD_CREDENTIALS)
 
 result = service \
     .files() \
@@ -69,5 +70,5 @@ def load_from_csv_to_database(target_folder=EXPORT_FOLDER) -> None:
 
 if __name__ == '__main__':
     get_csv_files()
-    load_from_csv_to_daваtabase()
+    load_from_csv_to_database()
 
