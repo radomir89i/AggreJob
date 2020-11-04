@@ -1,0 +1,66 @@
+WARNING - 04 - Nov - 20 14:29:38 - file_cache is unavailable when using oauth2client >= 4.0.0 or google-auth
+Traceback (most recent call last):
+  File "C:\Users\Radomir\PycharmProjects\git_app\aggrejob\venv\lib\site-packages\googleapiclient\discovery_cache\file_cache.py", line 33, in <module>
+    from oauth2client.contrib.locked_file import LockedFile
+ModuleNotFoundError: No module named 'oauth2client'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Radomir\PycharmProjects\git_app\aggrejob\venv\lib\site-packages\googleapiclient\discovery_cache\file_cache.py", line 37, in <module>
+    from oauth2client.locked_file import LockedFile
+ModuleNotFoundError: No module named 'oauth2client'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Radomir\PycharmProjects\git_app\aggrejob\venv\lib\site-packages\googleapiclient\discovery_cache\__init__.py", line 44, in autodetect
+    from . import file_cache
+  File "C:\Users\Radomir\PycharmProjects\git_app\aggrejob\venv\lib\site-packages\googleapiclient\discovery_cache\file_cache.py", line 40, in <module>
+    raise ImportError(
+ImportError: file_cache is unavailable when using oauth2client >= 4.0.0 or google-auth
+INFO - 04 - Nov - 20 14:29:39 - starting parsing
+INFO - 04 - Nov - 20 14:29:40 - parsing vacancies from page 0 of 20
+INFO - 04 - Nov - 20 14:29:40 - requesting IDs of current page vacancies
+INFO - 04 - Nov - 20 14:29:40 - requesting and parsing data for vacancies
+INFO - 04 - Nov - 20 14:30:02 - parsing finished
+INFO - 04 - Nov - 20 14:30:02 - creating file C:\Users\Radomir\PycharmProjects\git_app\aggrejob\data_files\python_04112020-143002.csv
+INFO - 04 - Nov - 20 14:30:02 - writing rows to file
+INFO - 04 - Nov - 20 14:30:02 - writing finished
+INFO - 04 - Nov - 20 14:30:02 - file closed
+INFO - 04 - Nov - 20 14:30:02 - starting parsing
+INFO - 04 - Nov - 20 14:30:02 - parsing vacancies from page 0 of 20
+INFO - 04 - Nov - 20 14:30:02 - requesting IDs of current page vacancies
+INFO - 04 - Nov - 20 14:30:03 - requesting and parsing data for vacancies
+INFO - 04 - Nov - 20 14:30:25 - parsing finished
+INFO - 04 - Nov - 20 14:30:25 - creating file C:\Users\Radomir\PycharmProjects\git_app\aggrejob\data_files\java_04112020-143025.csv
+INFO - 04 - Nov - 20 14:30:25 - writing rows to file
+INFO - 04 - Nov - 20 14:30:25 - writing finished
+INFO - 04 - Nov - 20 14:30:25 - file closed
+INFO - 04 - Nov - 20 14:30:25 - starting parsing
+INFO - 04 - Nov - 20 14:30:26 - parsing vacancies from page 0 of 20
+INFO - 04 - Nov - 20 14:30:26 - requesting IDs of current page vacancies
+INFO - 04 - Nov - 20 14:30:26 - requesting and parsing data for vacancies
+INFO - 04 - Nov - 20 14:30:47 - parsing finished
+INFO - 04 - Nov - 20 14:30:47 - creating file C:\Users\Radomir\PycharmProjects\git_app\aggrejob\data_files\c++_04112020-143047.csv
+INFO - 04 - Nov - 20 14:30:47 - writing rows to file
+INFO - 04 - Nov - 20 14:30:47 - writing finished
+INFO - 04 - Nov - 20 14:30:47 - file closed
+INFO - 04 - Nov - 20 14:30:47 - connecting to database
+INFO - 04 - Nov - 20 14:30:48 - connected to database
+INFO - 04 - Nov - 20 14:30:48 - opening file C:\Users\Radomir\PycharmProjects\git_app\aggrejob\data_files\c++_04112020-143047.csv
+INFO - 04 - Nov - 20 14:30:48 - reading csv file
+INFO - 04 - Nov - 20 14:30:48 - inserting rows into database
+INFO - 04 - Nov - 20 14:30:48 - import finished
+INFO - 04 - Nov - 20 14:30:48 - connecting to database
+INFO - 04 - Nov - 20 14:30:49 - connected to database
+INFO - 04 - Nov - 20 14:30:49 - opening file C:\Users\Radomir\PycharmProjects\git_app\aggrejob\data_files\java_04112020-143025.csv
+INFO - 04 - Nov - 20 14:30:49 - reading csv file
+INFO - 04 - Nov - 20 14:30:49 - inserting rows into database
+INFO - 04 - Nov - 20 14:30:49 - import finished
+INFO - 04 - Nov - 20 14:30:49 - connecting to database
+INFO - 04 - Nov - 20 14:30:49 - connected to database
+INFO - 04 - Nov - 20 14:30:49 - opening file C:\Users\Radomir\PycharmProjects\git_app\aggrejob\data_files\python_04112020-143002.csv
+INFO - 04 - Nov - 20 14:30:49 - reading csv file
+INFO - 04 - Nov - 20 14:30:49 - inserting rows into database
+INFO - 04 - Nov - 20 14:30:49 - import finished

@@ -1,13 +1,27 @@
 import re
+import os
+import csv
+import logging
 from abc import ABC, abstractmethod
 
 import requests
 import yaml
 import lxml
-import csv
 from bs4 import BeautifulSoup
 
-from ..config import Config
+from config import Config
+
+
+def catching_errors(func):
+    def wrapped(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+            return result
+        except Exception as e:
+            print(e)
+            logging.error(f'{e}')
+
+    return wrapped
 
 
 class Parser(ABC):
@@ -33,7 +47,7 @@ class Parser(ABC):
         Returns prepared data for writing in .csv file. The data is a list of lists(vacancies).
         The first list contains headers for .csv file -> ['vacancy_id, vacancy_name, url, source,
         salary_from, salary_to, currency, location, company, skill_set, description, publication_date']
-
+ы
         """
         pass
 
@@ -48,6 +62,7 @@ class Parser(ABC):
         pass
 
     @staticmethod
+    @catching_errors
     def write_csv_file(path, data: list) -> None:
 
         """
@@ -57,9 +72,13 @@ class Parser(ABC):
         :return: None
         """
 
-        with open(path, "w", encoding='utf-8') as f:
+        logging.info(f'creating file {path}')
+        with open(path, "w", encoding='utf-8', newline='\n') as f:
             writer = csv.writer(f, delimiter=",")
+            logging.info('writing rows to file')
             writer.writerows(data)
+            logging.info('writing finished')
+        logging.info('file closed')
 
 
 class HHParser(Parser):
@@ -78,6 +97,7 @@ class HHParser(Parser):
             'page': 0,
         }
 
+    @catching_errors
     def clean_vacancy_data(self, vacancy):
         vacancy_id = vacancy.get('id')
         vacancy_name = vacancy.get('name')
@@ -111,6 +131,7 @@ class HHParser(Parser):
 
         return vacancy_data
 
+    @catching_errors
     def parse(self):
 
         result = []
@@ -120,21 +141,25 @@ class HHParser(Parser):
 
         s = requests.Session()
 
+        logging.info('starting parsing')
         pages = s.get(self.URL, params=self.params, headers=self.HEADERS).json()['pages']
-        for i in range(pages):
+
+        for i in range(1):
+            logging.info(f'parsing vacancies from page {i} of {pages}')
             self.params['page'] = i
+            logging.info('requesting IDs of current page vacancies')
             data = s.get(self.URL, params=self.params, headers=self.HEADERS).json()
             current_page_vacancies = data['items']
 
+            logging.info('requesting and parsing data for vacancies')
             for vacancy in current_page_vacancies:
                 vac_data = requests.get(self.URL + '/' + vacancy['id'], params=self.params).json()
                 cleaned_data = HHParser.clean_vacancy_data(self, vac_data)
                 result.append(cleaned_data)
-
+        logging.info('parsing finished')
         return result
 
 
-class MKParser:
-    def parse(self):
-        pass
+
+
 
