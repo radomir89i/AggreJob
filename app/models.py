@@ -2,12 +2,9 @@ from app import db
 
 
 class Vacancy(db.Model):
-    # todo: add constraints to columns that should not be equal to None
-    # todo: add column publication date
-    # todo: is_actual (bool -> True or False)
     __table_name__ = 'vacancies'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    vacancy_id = db.Column(db.Integer, index=True, unique=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    vacancy_id = db.Column(db.String(64), index=True, unique=True)
     vacancy_name = db.Column(db.String(128), nullable=False)
     url = db.Column(db.String(64), nullable=False)
     source = db.Column(db.String(64), nullable=False)
