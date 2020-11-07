@@ -1,9 +1,6 @@
 import io
 import os
 
-import pandas as pd
-from sqlalchemy import create_engine
-
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.discovery import build
 
@@ -53,24 +50,6 @@ def get_csv_files(target_folder=Config.EXPORT_FOLDER) -> None:
                 print("Download %d%%." % int(status.progress() * 100))
 
 
-def load_from_csv_to_database(target_folder=Config.EXPORT_FOLDER) -> None:
-
-    """
-    Loads all *.csv files from target folder to database.
-    :param target_folder: path to *csv files folder
-    """
-
-    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
-    files = [os.path.join(target_folder, f) for f in os.listdir(target_folder) if f.endswith('.csv')]
-    for file in files:
-        data = pd.read_csv(file)
-        data.to_sql('vacancy', engine, if_exists='append', index=False)
-
-
-if __name__ == '__main__':
-    # get_csv_files()
-    # load_from_csv_to_database()
-    print(os.urandom(12).hex())
 
 
 
