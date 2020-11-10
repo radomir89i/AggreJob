@@ -1,16 +1,21 @@
 import os
 import csv
 import logging
+import requests
 
 import psycopg2 as pg
 
 from config import Config
+from .parsers import Parser, HHParser
 
 
 def transaction_check(func):
-    def wrapped(obj):
+    """
+    Decorator for closing db connection in case of errors
+    """
+    def wrapped(obj, *args, **kwargs):
         try:
-            func(obj)
+            func(obj, *args, **kwargs)
         except Exception as e:
             logging.error(f'{e} - rolling back')
             obj._conn.rollback()
@@ -25,10 +30,10 @@ class Loader:
         """
         Класс Loader реализует логику загрузчика csv в БД
 
-        :param creds: pg кредсы для psycopg2.connect
-        :param file_path: путь до csv
-        :param loading_type: принимает одно из след значений: 1. "INSERT" - импорт CSV в базу,
-                                                              2. "UPDATE" - обновление уже имеющихся вакансий
+        :param db_creds: credentials for connection to database using psycopg2
+        :param file_path: *.csv file for loading into database
+        :param loading_type: takes on of values: 1. "INSERT" - loading vacancies from csv into db,
+                                                 2. "UPDATE" - updating 'is_actual' column for vacancies in db
         """
 
         self.loading_type = loading_type
@@ -71,8 +76,29 @@ class Loader:
             logging.info('inserting finished')
 
     @transaction_check
-    def _update_vacancy_status(self):
-        pass
+    def _update_vacancy_status(self) -> None:
+        """
+        Updates relevancy of vacancies
+        """
+        for parser_class in Parser.__subclasses__():
+
+            logging.info('querying vacancies for')
+            query = 'SELECT vacancy_id from vacancy WHERE source = %s'
+            self._cur.execute(query, (parser_class.SOURCE_NAME,))
+            fetches = self._cur.fetchall()
+            vacancies_from_db = [i[0] for i in fetches]
+            logging.info(f'Got vacancies ids from database')
+
+            logging.info('Requesting web source for irrelevant vacancies...')
+            irrelevant_vacancies = parser_class('python').is_actual(vacancies_from_db)
+            logging.info('Got irrelevant vacancies')
+
+            logging.info('Updating "is_actual" status for irrelevant vacancies in database')
+            query = 'UPDATE vacancy SET is_actual = %s WHERE source = %s and vacancy_id = %s'
+            for vac_id in irrelevant_vacancies:
+                self._cur.execute(query, ('FALSE', parser_class.SOURCE_NAME, vac_id))
+            self._conn.commit()
+            logging.info('Updating finished')
 
     def run(self):
         if self.loading_type == 'INSERT':

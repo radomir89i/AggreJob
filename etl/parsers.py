@@ -60,6 +60,15 @@ class Parser(ABC):
         """
         pass
 
+    @abstractmethod
+    def is_actual(self, vacancies: list) -> list:
+        """
+
+        :param vacancies:
+        :return:
+        """
+        pass
+
     @staticmethod
     @catching_errors
     def write_csv_file(path, data: list) -> None:
@@ -86,6 +95,7 @@ class HHParser(Parser):
     HEADERS = {
         'User-Agent': 'api-test-agent'
     }
+    SOURCE_NAME = 'HH'
 
     def __init__(self, specialization: str):
         self.specialization = specialization
@@ -132,6 +142,16 @@ class HHParser(Parser):
 
         return vacancy_data
 
+    def is_actual(self, vacancies: list) -> list:
+        # может сессию создавать в init парсера???
+        result = []
+        s = requests.Session()
+        for vac_id in vacancies:
+            vac_data = s.get(self.URL + '/' + vac_id).json()
+            if vac_data.get('archived') or 'archived' not in vac_data:
+                result.append(vac_id)
+        return result
+
     @catching_errors
     def parse(self):
 
@@ -145,7 +165,7 @@ class HHParser(Parser):
         logging.info('start of parsing ...')
         pages = s.get(self.URL, params=self.params, headers=self.HEADERS).json()['pages']
 
-        for i in range(1):
+        for i in range(pages):
             logging.info(f'parsing vacancies from page {i} of {pages} ...')
             self.params['page'] = i
             logging.info('requesting IDs of current page vacancies ...')
