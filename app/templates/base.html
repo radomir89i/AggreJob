@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<!DOCTYPE html>
+<html lang="en">
+<html>
+    <head>
+        <title>JobAggregator</title>
+    </head>
+    <body>
+        <div>JobAggregator:
+            <a href="{{ url_for('login') }}">Sign in</a>
+            <a href="{{ url_for('job_search_wtf') }}">Job Search</a>
+        </div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form method="POST">
+        {{ form.csrf_token }}
+        {{ form.specialization }}
+        {{ form.skill }}
+        <input type="submit">
+    </form>
+    <script>
+    let spec_select = document.getElementById('specialization');
+    let skill_select = document.getElementById('skill');
+
+    spec_select.onchange = function() {
+        spec = spec_select.value;
+    }
+    </script>
+</body>
+</html>

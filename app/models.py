@@ -13,10 +13,11 @@ class Vacancy(db.Model):
     salary_to = db.Column(db.Integer, nullable=True)
     currency = db.Column(db.String(16))
     location = db.Column(db.String(64), nullable=False)
-    skill_set = db.Column(db.String(256))
+    skill_set = db.Column(db.ARRAY(db.String))
     description = db.Column(db.Text)
     is_actual = db.Column(db.Boolean, default=True)
     publication_date = db.Column(db.Date, nullable=False)
+    specialization = db.Column(db.String(16))
 
     def __repr__(self):
         return '<Vacancy {}>'.format(self.vacancy_name)
