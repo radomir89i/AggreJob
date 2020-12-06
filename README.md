@@ -1,5 +1,4 @@
-# AggreJob
-The very first p
+The main goal of this pet is aggregating 
 
-
-+ `asdasd`
++ `etl` - scripts for vacancy parser and loading to database
++ `app` - flask web-service
