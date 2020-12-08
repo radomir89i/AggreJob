@@ -1,12 +1,10 @@
-import os
 import csv
 import logging
-import requests
 
 import psycopg2 as pg
 
 from config import Config
-from .parsers import Parser, HHParser
+from .parsers import Parser
 
 
 def transaction_check(func):
@@ -28,7 +26,7 @@ def transaction_check(func):
 class Loader:
     def __init__(self, db_creds=Config.PG_CONNECTION, file_path=None, loading_type='INSERT'):
         """
-        Класс Loader реализует логику загрузчика csv в БД
+        Class for loading vacancies from csv into database and updating statuses of vacancies.
 
         :param db_creds: credentials for connection to database using psycopg2
         :param file_path: *.csv file for loading into database
@@ -65,12 +63,17 @@ class Loader:
             logging.info('inserting rows into database ...')
             query = '''INSERT INTO vacancy (vacancy_id, vacancy_name, url, source, company,
                                             salary_from, salary_to, currency, location,
-                                            skill_set, description, is_actual, publication_date)
-                       VALUES  (%s, %s, %s, %s, %s, NULLIF(%s, '')::int, NULLIF(%s, '')::int, %s, %s, %s, %s, %s, %s)'''
+                                            skill_set, description, is_actual, publication_date, specialization)
+                       VALUES  (%s, %s, %s, %s, %s, NULLIF(%s, '')::int, NULLIF(%s, '')::int, %s, %s, %s, %s, %s, %s, %s)'''
 
             for row in csv_reader:
                 if not self.vac_id_exists(row[0]):
+                    # f = filter(None, row[9].split(','))
+                    # row[9] = list(f)
+                    row[9] = row[9].split(',')[:-1]
                     self._cur.execute(query, tuple(row))
+                else:
+                    pass  # update row
 
             self._conn.commit()
             logging.info('inserting finished')

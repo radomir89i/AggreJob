@@ -32,7 +32,7 @@ class Parser(ABC):
         Key skills are predetermined and are kept spec_key_skills.yml file.
 
         :param specialization: main programming language -> 'Python'
-        :return: list of skills/technologies, connected to specialization -> ['django', 'git', 'linux']
+        :return: list of skills/technologies, connected with specialization -> ['django', 'git', 'linux']
         """
 
         with open(Config.KEY_SKILLS_FILE) as f:
@@ -124,21 +124,24 @@ class HHParser(Parser):
             salary_from, salary_to, currency = None, None, None
         location = vacancy['area']['name']
 
-        skill_set = []
+        skill_set = ''
         words = re.split(r'[;,"\(\)\{\}/\s]', str(vacancy))
         words = [word.lower() for word in words]
 
         for skill in self.key_skills:
             if skill in words:
-                skill_set.append(skill)
+                skill_set += skill + ','
+                # skill_set.append(skill)
 
         description = BeautifulSoup(vacancy.get('description'), 'lxml').text
 
         is_actual = True
 
+        specialization = self.specialization
+
         vacancy_data = [vacancy_id, vacancy_name, url, source, employer,
                         salary_from, salary_to, currency, location,
-                        skill_set, description, is_actual, publication_date]
+                        skill_set, description, is_actual, publication_date, specialization]
 
         return vacancy_data
 
@@ -158,14 +161,15 @@ class HHParser(Parser):
         result = []
         result.append('vacancy_id, vacancy_name, url, source, '
                       'company, salary_from, salary_to, currency, location, '
-                      ' skill_set, description, is_actual, publication_date'.split(', '))
+                      ' skill_set, description, is_actual, publication_date, '
+                      'specialization'.split(', '))
 
         s = requests.Session()
 
         logging.info('start of parsing ...')
         pages = s.get(self.URL, params=self.params, headers=self.HEADERS).json()['pages']
 
-        for i in range(pages):
+        for i in range(1):
             logging.info(f'parsing vacancies from page {i} of {pages} ...')
             self.params['page'] = i
             logging.info('requesting IDs of current page vacancies ...')
@@ -180,8 +184,4 @@ class HHParser(Parser):
 
         logging.info('parsing finished')
         return result
-
-
-
-
 

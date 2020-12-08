@@ -12,6 +12,10 @@ python:
   - redis
   - postgresql
   - mysql
+  - go
+  - java
+  - flask
+  - tensorflow
 
 java:
   - spring
