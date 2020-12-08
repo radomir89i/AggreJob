@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for vac in vacancies %}
+
+    <div class="card" style="width: 48rem;">
+        <div class="card-body">
+            <h5 class="card-title">{{vac[2]}}</h5>
+            {% for skill in vac[-3] %}
+                <span class="card-text badge badge-success">{{skill}}</span>
+            {% endfor %}
+            {% for skill in vac[-2] %}
+                <span class="card-text badge badge-danger">{{skill}}</span>
+            {% endfor %}
+            <p></p>
+            <h6 class="card-subtitle mb-2 text-muted">{{vac[5]}}, {{vac[9]}}</h6>
+            <p class="card-text">{{vac[11][:240]}}...</p>
+            <p class="card-text">Релевантность: {{vac[-1]}}</p>
+            <a href="{{vac[3]}}" class="card-link">{{vac[3]}}</a>
+         </div>
+    </div>
+
+{% endfor %}
+{% endblock %}

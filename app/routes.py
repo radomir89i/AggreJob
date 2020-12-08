@@ -1,24 +1,37 @@
-from flask import request
-import pandas as pd
+from flask import render_template, request, flash, redirect, url_for
+
 from app import app
-import os
+from app.forms import LoginForm, JobSearchForm
+from .utils import relevant_vacancies
+
 
 @app.route('/')
-def hello_world():
-    return 'Hello, World!'
+def index():
+    return render_template('base.html')
 
 
-@app.route('/get_data')
-def get_data():
-    vacancy_name = request.args.get('vacancy_name')
-    if vacancy_name == 'python':
-        content = ''
-        data = pd.read_csv('proper_data.csv', delimiter=',').values
-        for row in data:
-            content += str(list(row)) + '<br>'
-        return content
+@app.route('/find_job', methods=['post', 'get'])
+def find_job():
 
-    elif vacancy_name is not None and vacancy_name != 'python':
-        return f'Has no data for vacancy_name={vacancy_name}'
-    else:
-        return 'Got no "vacancy_name" parameter'
+    form = JobSearchForm()
+    if form.validate_on_submit():
+        skills = request.form.get('skills_str').split()
+        specialization = form.specialization.data.lower()
+        vacancies = relevant_vacancies(specialization, skills)
+        checkbox = request.form.getlist('mycheckbox')
+        return render_template('search_results.html', user_specialization=specialization, vacancies=vacancies)
+
+    return render_template('find_job.html', form=form)
+
+
+@app.route('/login', methods=['post', 'get'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
+            form.username.data, form.remember_me.data))
+        return redirect(url_for('index'))
+    return render_template('login.html', title='Sign In', form=form)
+
+
+

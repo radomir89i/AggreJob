@@ -1,7 +1,7 @@
 import io
 import os
 
-from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 from googleapiclient.discovery import build
 
 from config import GoogleDrive, Config
@@ -15,6 +15,38 @@ result = service \
         pageSize=1000,
         fields='nextPageToken, files(id, name, mimeType)') \
     .execute()['files']
+
+
+def upload_file(file_path: str) -> None:
+
+    """
+    Uploads target file to GoogleDrive
+    """
+
+    file_metadata = {
+        'name': os.path.basename(file_path),
+        'parents': [GoogleDrive.FOLDER_ID],
+        'mimeType': 'text/csv',
+    }
+    media = MediaFileUpload(file_path, resumable=True)
+    service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+
+
+def upload_csv_files(target_folder=Config.EXPORT_FOLDER):
+
+    """
+    Uploads all *.csv files from target folder to GoogleDrive
+    """
+
+    files = [os.path.join(target_folder, f) for f in os.listdir(target_folder) if f.endswith('.csv')]
+    for file in files:
+        file_metadata = {
+            'name': os.path.basename(file),
+            'parents': [GoogleDrive.FOLDER_ID],
+            'mimeType': 'text/csv',
+        }
+        media = MediaFileUpload(file, resumable=True)
+        service.files().create(body=file_metadata, media_body=media, fields='id').execute()
 
 
 def delete_csv_files() -> None:
@@ -48,7 +80,6 @@ def get_csv_files(target_folder=Config.EXPORT_FOLDER) -> None:
             while not done:
                 status, done = downloader.next_chunk()
                 print("Download %d%%." % int(status.progress() * 100))
-
 
 
 

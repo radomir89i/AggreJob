@@ -32,7 +32,7 @@ class Parser(ABC):
         Key skills are predetermined and are kept spec_key_skills.yml file.
 
         :param specialization: main programming language -> 'Python'
-        :return: list of skills/technologies, connected to specialization -> ['django', 'git', 'linux']
+        :return: list of skills/technologies, connected with specialization -> ['django', 'git', 'linux']
         """
 
         with open(Config.KEY_SKILLS_FILE) as f:
@@ -57,6 +57,15 @@ class Parser(ABC):
         Parses vacancy data returned by source(job search website)
         :param vacancy: dict with vacancy data from source
         :return: list of needed vacancy info accordingly to .csv header
+        """
+        pass
+
+    @abstractmethod
+    def is_actual(self, vacancies: list) -> list:
+        """
+
+        :param vacancies:
+        :return:
         """
         pass
 
@@ -86,6 +95,7 @@ class HHParser(Parser):
     HEADERS = {
         'User-Agent': 'api-test-agent'
     }
+    SOURCE_NAME = 'HH'
 
     def __init__(self, specialization: str):
         self.specialization = specialization
@@ -114,23 +124,36 @@ class HHParser(Parser):
             salary_from, salary_to, currency = None, None, None
         location = vacancy['area']['name']
 
-        skill_set = []
+        skill_set = ''
         words = re.split(r'[;,"\(\)\{\}/\s]', str(vacancy))
         words = [word.lower() for word in words]
 
         for skill in self.key_skills:
             if skill in words:
-                skill_set.append(skill)
+                skill_set += skill + ','
+                # skill_set.append(skill)
 
         description = BeautifulSoup(vacancy.get('description'), 'lxml').text
 
         is_actual = True
 
+        specialization = self.specialization
+
         vacancy_data = [vacancy_id, vacancy_name, url, source, employer,
                         salary_from, salary_to, currency, location,
-                        skill_set, description, is_actual, publication_date]
+                        skill_set, description, is_actual, publication_date, specialization]
 
         return vacancy_data
+
+    def is_actual(self, vacancies: list) -> list:
+        # может сессию создавать в init парсера???
+        result = []
+        s = requests.Session()
+        for vac_id in vacancies:
+            vac_data = s.get(self.URL + '/' + vac_id).json()
+            if vac_data.get('archived') or 'archived' not in vac_data:
+                result.append(vac_id)
+        return result
 
     @catching_errors
     def parse(self):
@@ -138,7 +161,8 @@ class HHParser(Parser):
         result = []
         result.append('vacancy_id, vacancy_name, url, source, '
                       'company, salary_from, salary_to, currency, location, '
-                      ' skill_set, description, is_actual, publication_date'.split(', '))
+                      ' skill_set, description, is_actual, publication_date, '
+                      'specialization'.split(', '))
 
         s = requests.Session()
 
@@ -160,8 +184,4 @@ class HHParser(Parser):
 
         logging.info('parsing finished')
         return result
-
-
-
-
 

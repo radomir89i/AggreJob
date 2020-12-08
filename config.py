@@ -31,6 +31,7 @@ class Config:
                         filename=os.path.join(LOGS_FOLDER, 'log.log'),
                         level=logging.INFO)
 
+
 class GoogleDrive:
     SERVICE_ACCOUNT_FILE = os.path.join(Config.CONFIG_FOLDER, 'gdrive_credentials.json')
     SCOPES = ['https://www.googleapis.com/auth/drive']

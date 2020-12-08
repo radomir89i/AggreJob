@@ -2,3 +2,5 @@
 /config/credentials.yml
 /etl/__pycache__
 /logs/
+/app/__pycache__
+/migrations/__pycache__
