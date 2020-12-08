@@ -4,7 +4,7 @@ import logging
 import psycopg2 as pg
 
 from config import Config
-from .parsers import Parser
+from .parser import Parser
 
 
 def transaction_check(func):
