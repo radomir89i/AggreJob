@@ -1,6 +1,5 @@
 /config/gdrive_credentials.json
 /config/credentials.yml
-/etl/__pycache__
+__pycache__/
 /logs/
-/app/__pycache__
-/migrations/__pycache__
+*.pyc
