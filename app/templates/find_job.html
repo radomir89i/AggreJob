@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 
+{% block javascript %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/find_job.js') }}"></script>
+{% endblock %}
+
 {% block content %}
-<form method="post">
+<form method="post" style="margin-top: 20px">
     {{ form.csrf_token }}
     {{ form.hidden_tag() }}
     {{ form.specialization }}
     {% for error in form.specialization.errors %}
             <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
-    <div class="input-group mb-3">
+    <!--<div class="input-group mb-3">
         <div class="input-group-prepend">
             <div class="input-group-text">
                 <input type="checkbox" aria-label="Checkbox for following text input" value="01" name="mycheckbox">  Skill 1
@@ -21,10 +25,13 @@
             </div>
 
         </div>
-    </div>
-  <input type="text" class="form-control" aria-label="Text input with checkbox" name="skills_str">
+    </div>-->
+  <input type="text" id="skills_str" class="form-control" placeholder="Enter your skills here" aria-label="Text input with checkbox" name="skills_str">
 
-  <input id="elem" type="submit" value="Искать вакансии">
+  <input id="elem" type="submit" style="margin-top: 10px" value="Искать вакансии">
+  <div id="democontainer" style="margin-top: 20px">
+
+  </div>
 
       <!--<script>
           function handler1() {
