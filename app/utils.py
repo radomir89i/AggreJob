@@ -25,9 +25,8 @@ def relevant_vacancies(user_specialization: str, user_key_skills: list) -> list:
             relevance = len(coincident) / len(set(vac_key_skills))
         else:
             coincident, missing = set(), set()
-            relevance = 0.5
+            relevance = 0.2
         vac_plus = vac + (coincident,) + (missing,) + (relevance,)
-        print(vac_plus[15:18])
         relevant_list.append(vac_plus)
 
     result = sorted(relevant_list, key=lambda x: x[-1], reverse=True)

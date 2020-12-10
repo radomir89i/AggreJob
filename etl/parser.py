@@ -122,16 +122,15 @@ class HHParser(Parser):
             currency = salary.get('currency')
         else:
             salary_from, salary_to, currency = None, None, None
+
         location = vacancy['area']['name']
 
         skill_set = ''
-        words = re.split(r'[;,"\(\)\{\}/\s]', str(vacancy))
-        words = [word.lower() for word in words]
+        vacancy_key_skills = [skill.get('name').lower() for skill in vacancy.get('key_skills')]
 
         for skill in self.key_skills:
-            if skill in words:
+            if skill in vacancy_key_skills:
                 skill_set += skill + ','
-                # skill_set.append(skill)
 
         description = BeautifulSoup(vacancy.get('description'), 'lxml').text
 
@@ -146,7 +145,6 @@ class HHParser(Parser):
         return vacancy_data
 
     def is_actual(self, vacancies: list) -> list:
-        # может сессию создавать в init парсера???
         result = []
         s = requests.Session()
         for vac_id in vacancies:
@@ -169,7 +167,7 @@ class HHParser(Parser):
         logging.info('start of parsing ...')
         pages = s.get(self.URL, params=self.params, headers=self.HEADERS).json()['pages']
 
-        for i in range(1):
+        for i in range(pages):
             logging.info(f'parsing vacancies from page {i} of {pages} ...')
             self.params['page'] = i
             logging.info('requesting IDs of current page vacancies ...')

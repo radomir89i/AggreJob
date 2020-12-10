@@ -61,19 +61,33 @@ class Loader:
             next(csv_reader)
 
             logging.info('inserting rows into database ...')
-            query = '''INSERT INTO vacancy (vacancy_id, vacancy_name, url, source, company,
+            query_ins = '''INSERT INTO vacancy (vacancy_id, vacancy_name, url, source, company,
                                             salary_from, salary_to, currency, location,
                                             skill_set, description, is_actual, publication_date, specialization)
                        VALUES  (%s, %s, %s, %s, %s, NULLIF(%s, '')::int, NULLIF(%s, '')::int, %s, %s, %s, %s, %s, %s, %s)'''
+            query_ups = '''UPDATE vacancy  
+                           SET vacancy_name = %s, 
+                              url = %s, 
+                              source = %s, 
+                              company = %s,
+                              salary_from = NULLIF(%s, '')::int,
+                              salary_to = NULLIF(%s, '')::int, 
+                              currency = %s, 
+                              location = %s,
+                              skill_set = %s, 
+                              description = %s, 
+                              is_actual = %s, 
+                              publication_date = %s, 
+                              specialization = %s
+                          WHERE vacancy_id = %s;'''
 
             for row in csv_reader:
+                row[9] = row[9].split(',')[:-1]
                 if not self.vac_id_exists(row[0]):
-                    # f = filter(None, row[9].split(','))
-                    # row[9] = list(f)
-                    row[9] = row[9].split(',')[:-1]
-                    self._cur.execute(query, tuple(row))
+                    self._cur.execute(query_ins, tuple(row))
                 else:
-                    pass  # update row
+
+                    self._cur.execute(query_ups, tuple(row[1:]) + (row[0],))
 
             self._conn.commit()
             logging.info('inserting finished')
@@ -106,6 +120,6 @@ class Loader:
     def run(self):
         if self.loading_type == 'INSERT':
             self.from_csv_to_db()
-        else:
+        elif self.loading_type == 'UPDATE':
             self._update_vacancy_status()
 
