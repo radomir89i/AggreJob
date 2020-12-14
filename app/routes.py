@@ -10,24 +10,6 @@ def index():
     return render_template('base.html')
 
 
-@app.route('/test', methods=['GET', 'POST'])
-def testfn():
-    # GET request
-    if request.method == 'GET':
-        message = {'greeting':'Hello from Flask!'}
-        return jsonify(message)  # serialize and use JSON headers
-    # POST request
-    if request.method == 'POST':
-        print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
-
-
-@app.route('/hello')
-def hello():
-    text = request.args.get('text')
-    return 'Hello ' + text
-
-
 @app.route('/results')
 def results():
     specialization = request.args.get('specialization').lower()
