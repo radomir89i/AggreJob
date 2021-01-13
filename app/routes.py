@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, redirect, url_for, jsonify
+from flask import render_template, request, flash, redirect, url_for
 
 from app import app
 from app.forms import LoginForm, JobSearchForm
@@ -15,20 +15,12 @@ def results():
     specialization = request.args.get('specialization').lower()
     skills = request.args.get('skills_str').split()
     vacancies = relevant_vacancies(specialization, skills)
-    return render_template('test_search_results.html', vacancies=vacancies)
+    return render_template('search_results.html', vacancies=vacancies)
 
 
 @app.route('/find_job', methods=['post', 'get'])
 def find_job():
-
     form = JobSearchForm()
-    if form.validate_on_submit():
-        skills = request.form.get('skills_str').split()
-        specialization = form.specialization.data.lower()
-        vacancies = relevant_vacancies(specialization, skills)
-        checkbox = request.form.getlist('mycheckbox')
-        return render_template('search_results.html', user_specialization=specialization, vacancies=vacancies)
-
     return render_template('find_job.html', form=form)
 
 

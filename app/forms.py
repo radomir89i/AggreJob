@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 
 
@@ -11,14 +11,6 @@ class LoginForm(FlaskForm):
 
 
 class JobSearchForm(FlaskForm):
-    spec_list = ['Python', 'Java']
+    spec_list = ['Python', 'Java', 'C++']
     choices = [(i, i) for i in spec_list]
-    specialization = RadioField('Label', choices=choices, validators=[DataRequired()])  # choices=[('value', 'description'), ('value_two', 'whatever')])
-
-
-'''class SimpleForm(FlaskForm):
-    def __init__(self, specialization, skills):
-        self.specialization = specialization
-        self.skills = skills
-
-    specialization = SelectField('specialization', choices=)'''
+    specialization = RadioField('Label', choices=choices, validators=[DataRequired()])

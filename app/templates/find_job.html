@@ -12,40 +12,13 @@
     {% for error in form.specialization.errors %}
             <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
-    <!--<div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <div class="input-group-text">
-                <input type="checkbox" aria-label="Checkbox for following text input" value="01" name="mycheckbox">  Skill 1
-            </div>
-            <div class="input-group-text">
-                <input type="checkbox" aria-label="Checkbox for following text input" value="02" name="mycheckbox">  Skill 2
-            </div>
-            <div class="input-group-text">
-                <input type="checkbox" aria-label="Checkbox for following text input" value="03" name="mycheckbox">  Skill 3
-            </div>
 
-        </div>
-    </div>-->
   <input type="text" id="skills_str" class="form-control" placeholder="Enter your skills here" aria-label="Text input with checkbox" name="skills_str">
 
   <input id="elem" type="submit" style="margin-top: 10px" value="Искать вакансии">
   <div id="democontainer" style="margin-top: 20px">
 
   </div>
-
-      <!--<script>
-          function handler1() {
-            alert('Спасибо!');
-          };
-
-          function handler2() {
-            alert('Спасибо ещё раз!');
-          }
-
-          elem.onclick = () => alert("Привет");
-          elem.addEventListener("click", handler1); // Спасибо!
-          elem.addEventListener("click", handler2); // Спасибо ещё раз!
-      </script>-->
 
 </form>
 {% endblock %}

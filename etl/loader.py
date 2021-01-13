@@ -95,7 +95,7 @@ class Loader:
     @transaction_check
     def _update_vacancy_status(self) -> None:
         """
-        Updates relevancy of vacancies
+        Updates relevancy of all vacancies from database
         """
         for parser_class in Parser.__subclasses__():
 
