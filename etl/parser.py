@@ -3,6 +3,7 @@ import os
 import csv
 import logging
 from abc import ABC, abstractmethod
+from typing import List, Dict
 
 import requests
 import yaml
@@ -25,11 +26,11 @@ def catching_errors(func):
 
 class Parser(ABC):
     @staticmethod
-    def _get_key_skills(specialization: str) -> list:
+    def _get_key_skills(specialization: str) -> List[str]:
 
         """
         Gets list of key skills for given specialization.
-        Key skills are predetermined and are kept spec_key_skills.yml file.
+        Key skills are predetermined and are kept in spec_key_skills.yml file.
 
         :param specialization: main programming language -> 'Python'
         :return: list of skills/technologies, connected with specialization -> ['django', 'git', 'linux']
@@ -40,7 +41,7 @@ class Parser(ABC):
         return config[specialization]
 
     @abstractmethod
-    def parse(self) -> list:
+    def parse(self) -> List[List]:
 
         """
         Returns prepared data for writing in .csv file. The data is a list of lists(vacancies).
@@ -51,7 +52,7 @@ class Parser(ABC):
         pass
 
     @abstractmethod
-    def clean_vacancy_data(self, vacancy: dict) -> list:
+    def clean_vacancy_data(self, vacancy: Dict) -> List:
 
         """
         Parses vacancy data returned by source(job search website)
@@ -61,17 +62,15 @@ class Parser(ABC):
         pass
 
     @abstractmethod
-    def is_actual(self, vacancies: list) -> list:
+    def is_actual(self, vacancies: List[str]) -> List[str]:
         """
-
-        :param vacancies:
-        :return:
+        For given list of vacancies checks if vacancy is actual(not archived) and returns a list of
         """
         pass
 
     @staticmethod
     @catching_errors
-    def write_csv_file(path, data: list) -> None:
+    def write_csv_file(path, data: List[List]) -> None:
 
         """
         Writes prepared data to adjusted .csv file.
